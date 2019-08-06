@@ -1,2 +1,59 @@
 ---
-# tasks file for kubeadm
+- name: remove swapfile from /etc/fstab
+  mount:
+    name: "{{ item }}"
+    fstype: swap
+    state: absent
+  with_items:
+    - swap
+    - none
+- name: disable swap
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+- name: add apt key
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+- name: add apt repository
+  apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    filename: kubernetes.list
+- name: install kubelet, kubeadm, kubectl and ipset packages
+  apt:
+    name: [ 'kubelet', 'kubeadm', 'kubectl', 'ipset' ]
+    state: present
+    update_cache: yes
+- name: upload kubeadm-config to /etc/kubernetes
+  template:
+    src: kubeadm-config.yaml.j2
+    dest: /etc/kubernetes/kubeadm-config.yaml
+    mode: 644
+- name: initial kubeadmin
+  command: kubeadm init --config=/etc/kubernetes/kubeadm-config.yaml --upload-certs
+- name: restart kubelet service
+  service:
+    name: kubelet
+    daemon_reload: yes
+    state: restarted
+  environment:
+    KUBELET_EXTRA_ARGS: --node-ip={{ ansible_all_ipv4_addresses[0] }}
+- name: create directory of store kubeconfig for default user
+  file:
+    path: /home/{{ default_user }}/.kube
+    state: directory
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: '0755'
+- name: copy kubeconfig for default user
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /home/{{ default_user }}/.kube/config
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: '0644'
+    remote_src: yes
+- name: install calico pod network
+  become: true
+  become_user: "{{ default_user }}"
+  command: kubectl apply -f https://docs.projectcalico.org/v3.8/manifests/calico.yaml

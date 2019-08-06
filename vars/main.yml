@@ -1,2 +1,5 @@
 ---
-# vars file for kubeadm
+controlPlaneEndpoint:
+  host: "{{ ansible_all_ipv4_addresses[0] }}"
+  port: 6443
+default_user: vagrant

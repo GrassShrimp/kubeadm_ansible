@@ -1,0 +1,18 @@
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: {{ ansible_all_ipv4_addresses[0] }}
+  bindPort: 6443
+nodeRegistration:
+  name: master
+---
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+kubernetesVersion: stable
+controlPlaneEndpoint: {{ controlPlaneEndpoint.host }}:{{ controlPlaneEndpoint.port }}
+networking:
+  serviceSubnet: 192.168.0.0/16 # For calico network add-on
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+mode: "ipvs"
