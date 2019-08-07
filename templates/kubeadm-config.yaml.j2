@@ -4,6 +4,7 @@ localAPIEndpoint:
   advertiseAddress: {{ ansible_all_ipv4_addresses[0] }}
   bindPort: 6443
 nodeRegistration:
+  criSocket: /var/run/crio/crio.sock
   name: master
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
