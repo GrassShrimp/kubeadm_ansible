@@ -1,2 +1,8 @@
 ---
-# handlers file for kubeadm
+- name: restart kubelet service
+  service:
+    name: kubelet
+    daemon_reload: yes
+    state: restarted
+  environment:
+    KUBELET_EXTRA_ARGS: --node-ip={{ ansible_all_ipv4_addresses[0] }}

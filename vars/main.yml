@@ -3,3 +3,6 @@ controlPlaneEndpoint:
   host: "{{ ansible_all_ipv4_addresses[0] }}"
   port: 6443
 default_user: vagrant
+hosts: 
+  - { hostname: 'master-1', ip_address: '172.28.128.3', type: 'master-init' }
+  - { hostname: 'master-2', ip_address: '172.28.128.4', type: 'master-join' }

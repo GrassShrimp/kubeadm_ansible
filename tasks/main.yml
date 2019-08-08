@@ -1,4 +1,7 @@
 ---
+- name: set fact
+  set_fact:
+    type: "{% for item in hosts if item.ip_address in ansible_all_ipv4_addresses %}{{ item.type }}{% endfor %}"
 - name: remove swapfile from /etc/fstab
   mount:
     name: "{{ item }}"
@@ -24,36 +27,6 @@
     name: [ 'kubelet', 'kubeadm', 'kubectl', 'ipset' ]
     state: present
     update_cache: yes
-- name: upload kubeadm-config to /etc/kubernetes
-  template:
-    src: kubeadm-config.yaml.j2
-    dest: /etc/kubernetes/kubeadm-config.yaml
-    mode: 644
-- name: initial kubeadmin
-  command: kubeadm init --config=/etc/kubernetes/kubeadm-config.yaml --upload-certs
-- name: restart kubelet service
-  service:
-    name: kubelet
-    daemon_reload: yes
-    state: restarted
-  environment:
-    KUBELET_EXTRA_ARGS: --node-ip={{ ansible_all_ipv4_addresses[0] }}
-- name: create directory of store kubeconfig for default user
-  file:
-    path: /home/{{ default_user }}/.kube
-    state: directory
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
-    mode: '0755'
-- name: copy kubeconfig for default user
-  copy:
-    src: /etc/kubernetes/admin.conf
-    dest: /home/{{ default_user }}/.kube/config
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
-    mode: '0644'
-    remote_src: yes
-- name: install calico pod network
-  become: true
-  become_user: "{{ default_user }}"
-  command: kubectl apply -f https://docs.projectcalico.org/v3.8/manifests/calico.yaml
+- name: initialize the kubernetes cluster using kubeadm
+  include_tasks: master_initail.yml
+  when: type == 'master-init'
