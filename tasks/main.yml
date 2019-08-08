@@ -30,3 +30,6 @@
 - name: initialize the kubernetes cluster using kubeadm
   include_tasks: master_initail.yml
   when: type == 'master-init'
+- name: join other controll panels
+  include_tasks: master_join.yml
+  when: type == 'master-join'

@@ -1,0 +1,8 @@
+---
+- name: kubeadmin join controll panel
+  command: "{{ join_command + ' --apiserver-advertise-address=' + ansible_all_ipv4_addresses[0] }}"
+  vars:
+    join_command: "{{ lookup('file', './join-master-command') }}"
+  notify: "restart kubelet service"
+- name: setup kubeconfig for default user
+  include_tasks: setup_kubeconfig.yml
