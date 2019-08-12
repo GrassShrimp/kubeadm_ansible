@@ -7,3 +7,11 @@ hosts:
   - { hostname: 'master-1', ip_address: '172.28.128.3', type: 'master-init' }
   - { hostname: 'master-2', ip_address: '172.28.128.4', type: 'master-join' }
   - { hostname: 'worker-2', ip_address: '172.28.128.6', type: 'worker' }
+# etcd_cluster:
+#   hosts:
+#     - { ip_address: '172.28.128.3', port: 2379 }
+#     - { ip_address: '172.28.128.4', port: 2379 }
+#     - { ip_address: '172.28.128.5', port: 2379 }
+#   caFile: "/path/to/ca.pem"
+#   certFile: "/path/to/cert.pem"
+#   keyFile: "/path/to/key.pem"

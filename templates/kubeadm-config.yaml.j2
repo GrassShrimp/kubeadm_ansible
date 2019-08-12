@@ -10,6 +10,17 @@ kubernetesVersion: stable
 controlPlaneEndpoint: {{ controlPlaneEndpoint.host }}:{{ controlPlaneEndpoint.port }}
 networking:
   serviceSubnet: 192.168.0.0/16 # For calico network add-on
+{% if etcd_cluster is defined %}
+etcd:
+  external:
+    endpoints:
+    {% for item in etcd_cluster.hosts -%}
+      - https://{{ item.ip_address }}:{{ item.port }}
+    {% endfor -%}
+    caFile: {{ ansible_user_dir }}/ssl/ca.pem
+    certFile: {{ ansible_user_dir }}/ssl/cert.pem
+    keyFile: {{ ansible_user_dir }}/ssl/key.pem
+{% endif %}
 ---
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
 kind: KubeProxyConfiguration

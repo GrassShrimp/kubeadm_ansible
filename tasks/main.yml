@@ -27,6 +27,9 @@
     name: [ 'kubelet', 'kubeadm', 'kubectl', 'ipset' ]
     state: present
     update_cache: yes
+- name: prepare etcd certificates
+  include_tasks: prepare_etcd_certificates.yml
+  when: etcd_cluster is defined and (type == 'master-init' or type == 'master-join')
 - name: initialize the kubernetes cluster using kubeadm
   include_tasks: master_initail.yml
   when: type == 'master-init'

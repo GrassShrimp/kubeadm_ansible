@@ -1,0 +1,14 @@
+---
+- name: create directory for put client certificates
+  file:
+    path: "{{ ansible_user_dir }}/ssl"
+    state: directory
+    mode: '0755'
+- name: upload etcd client certificates to server
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: "{{ etcd_cluster.caFile }}", dest: "{{ ansible_user_dir }}/ssl/ca.pem" }
+    - { src: "{{ etcd_cluster.certFile }}", dest: "{{ ansible_user_dir }}/ssl/cert.pem" }
+    - { src: "{{ etcd_cluster.keyFile }}", dest: "{{ ansible_user_dir }}/ssl/key.pem" }
